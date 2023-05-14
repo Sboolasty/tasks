@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 
-@NoArgsConstructor
 @Entity(name = "tasks")
 public class Task {
     public Long getId() {
@@ -23,7 +22,8 @@ public class Task {
     public String getContent() {
         return content;
     }
-
+    public Task (){
+    }
     public Task(Long id, String title, String content) {
         this.id = id;
         this.title = title;
