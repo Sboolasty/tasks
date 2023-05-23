@@ -15,15 +15,17 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+//@RequiredArgsConstructor  nie działa lombok
 public class TrelloClient {
 
     private final RestTemplate restTemplate;
 
-   public TrelloClient(RestTemplate restTemplate) {
+    public TrelloClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-   }
+    }
 
-
+    @Value("${trello.username}")
+    private String trelloUsername;
     @Value("${trello.api.endpoint.prod}")
     private String trelloApiEndpoint;
     @Value("${trello.app.key}")
@@ -32,18 +34,22 @@ public class TrelloClient {
     private String trelloToken;
 
     public List<TrelloBoardDto> getTrelloBoards() {
-        URI url = UriComponentsBuilder.fromHttpUrl(trelloApiEndpoint + "/members/SebastianWojdal/boards")
-                .queryParam("key", trelloAppKey)
-                .queryParam("token", trelloToken)
-                .queryParam("fields", "name,id")
-                .build()
-                .encode()
-                .toUri();
+        URI url = buildApiUrl();
 
         TrelloBoardDto[] boardsResponse = restTemplate.getForObject(url, TrelloBoardDto[].class);
 
         return Optional.ofNullable(boardsResponse)
                 .map(Arrays::asList)
                 .orElse(Collections.emptyList());
+    }
+
+    private URI buildApiUrl() {
+        return UriComponentsBuilder.fromHttpUrl(trelloApiEndpoint + "/members/" + trelloUsername + "/boards")
+                .queryParam("key", trelloAppKey)
+                .queryParam("token", trelloToken)
+                .queryParam("fields", "name,id")
+                .build()
+                .encode()
+                .toUri();
     }
 }
