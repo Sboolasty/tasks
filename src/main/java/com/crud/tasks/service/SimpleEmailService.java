@@ -1,31 +1,27 @@
+
 package com.crud.tasks.service;
 
-
-
 import com.crud.tasks.domain.Mail;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class SimpleEmailService {
 
     private final JavaMailSender javaMailSender;
 
+    public SimpleEmailService(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
+
     public void send(final Mail mail) {
-        log.info("Starting email preparation...");
         try {
             SimpleMailMessage mailMessage = createMailMessage(mail);
             javaMailSender.send(mailMessage);
-            log.info("Email has been sent.");
         } catch (MailException e) {
-            log.error("Failed to process email sending: " + e.getMessage(), e);
+            e.printStackTrace();
         }
     }
 
@@ -34,11 +30,7 @@ public class SimpleEmailService {
         mailMessage.setTo(mail.getMailTo());
         mailMessage.setSubject(mail.getSubject());
         mailMessage.setText(mail.getMessage());
-
-        if (mail.getCc() != null && !mail.getCc().isEmpty()) {
-            mailMessage.setCc(mail.getCc());
-        }
-
+        mail.getCc().ifPresent(cc -> mailMessage.setCc(cc));
         return mailMessage;
     }
 }
