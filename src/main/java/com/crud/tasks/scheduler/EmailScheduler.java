@@ -1,7 +1,7 @@
 package com.crud.tasks.scheduler;
 
 
-import com.crud.tasks.trello.config.AdminConfig;
+import com.crud.tasks.config.AdminConfig;
 import com.crud.tasks.domain.Mail;
 import com.crud.tasks.repository.TaskRepository;
 import com.crud.tasks.service.SimpleEmailService;
@@ -18,15 +18,15 @@ public class EmailScheduler {
     private final TaskRepository taskRepository;
     private final AdminConfig adminConfig;
 
-    @Scheduled(cron = "0 0 10 * * *")
+    @Scheduled(cron = "0 0 6 * * *")
     public void sendInformationEmail() {
         long size = taskRepository.count();
-        String tasksText = (size == 1) ? "task" : "tasks";
-        simpleEmailService.send(
+        String taskVariant = (size == 1) ? "task" : "tasks";
+        simpleEmailService.sendScheduled(
                 new Mail(
                         adminConfig.getAdminMail(),
                         SUBJECT,
-                        "Currently in database you got: " + size + " " + tasksText
+                        "Currently you have: " + size + " " + taskVariant + "in the database."
                 )
         );
     }
